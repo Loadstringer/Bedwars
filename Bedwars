@@ -1,0 +1,94 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("BedwarsHub", "BloodTheme")-- the themes are BloodTheme GrapeTheme Synapse
+--MAIN--
+local Main = Window:NewTab("Main")
+local MainSection = Main:NewSection("Main")
+MainSection:NewToggle("KillAura", "Autoswing the sword if someone is near you", function(state)
+	if state then
+		BindToStepped("Killaura", 1, function()
+			if entity.isAlive then
+				KillauraRemote()
+			end
+		end)
+	else
+		UnbindFromStepped("Killaura")
+	end
+function getsword()
+	local sd
+	local higherdamage
+	local swordslots
+	local swords = getinv().items
+	for i, v in pairs(swords) do
+		if v.itemType:lower():find("sword") or v.itemType:lower():find("blade") then
+			if higherdamage == nil or itemstuff[v.itemType].sword.damage > higherdamage then
+				sd = v
+				higherdamage = itemstuff[v.itemType].sword.damage
+				swordslots = i
+			end
+		end
+	end
+	return sd, swordslots
+end
+
+local function getremote(tab)
+	for i,v in pairs(tab) do
+		if v == "Client" then
+			return tab[i + 1]
+		end
+	end
+	return ""
+end
+
+local function hvFunc(cock)
+	return {hashedval = cock}
+end
+
+local function targetCheck(plr, check)
+	return (check and plr.Character.Humanoid.Health > 0 and plr.Character:FindFirstChild("ForceField") == nil or check == false)-- idk why it uses forcefeild lmao
+end
+
+local function isPlayerTargetable(plr, target)
+	return plr ~= lplr and plr and isAlive(plr) and targetCheck(plr, target)
+end
+
+local function GetAllNearestHumanoidToPosition(distance, amount)
+	local returnedplayer = {}
+	local currentamount = 0
+	if entity.isAlive then -- alive check
+		for i, v in pairs(game.Players:GetChildren()) do -- loop through players
+			if isPlayerTargetable((v), true, true, v.Character ~= nil) and v.Character:FindFirstChild("HumanoidRootPart") and v.Character:FindFirstChild("Head") and currentamount < amount then -- checks
+				local mag = (lplr.Character.HumanoidRootPart.Position - v.Character:FindFirstChild("HumanoidRootPart").Position).magnitude
+				if mag <= distance then -- mag check
+					table.insert(returnedplayer, v)
+					currentamount = currentamount + 1
+				end
+			end
+		end
+		for i2,v2 in pairs(game:GetService("CollectionService"):GetTagged("Monster")) do -- monsters
+			if v2:FindFirstChild("HumanoidRootPart") and currentamount < amount and v2.Name ~= "Duck" then -- no duck
+				local mag = 
+(lplr.Character.HumanoidRootPart.Position - v.Character:FindFirstChild("HumanoidRootPart").Position).magnitude
+				if mag <= distance then -- mag check
+					table.insert(returnedplayer, v)
+					currentamount = currentamount + 1
+				end
+			end
+		end
+		for i2,v2 in pairs(game:GetService("CollectionService"):GetTagged("Monster")) do -- monsters
+			if v2:FindFirstChild("HumanoidRootPart") and currentamount < amount and v2.Name ~= "Duck" then -- no duck
+				local mag = (lplr.Character.HumanoidRootPart.Position - v2.HumanoidRootPart.Position).magnitude
+				if mag <= distance then -- magcheck
+					table.insert(returnedplayer, {Name = (v2 and v2.Name or "Monster"), UserId = 1443379645, Character = v2}) -- monsters are npcs so I have to create a fake player for target info
+					currentamount = currentamount + 1
+				end
+			end
+		end
+	end
+	return returnedplayer -- table of attackable entities
+end
+
+end)
+
+MainSection:NewToggle("Niggers", "auto kills niggas" function(callback)
+if callback then
+print("nigga")-- use this bit as a template and when putting code replace "print(nigga)" with the code u wanna use 
